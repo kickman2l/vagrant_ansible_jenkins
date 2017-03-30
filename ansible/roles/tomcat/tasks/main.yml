@@ -1,0 +1,69 @@
+---
+# tasks file for tomcat
+# Created group
+- name: Creating group.
+  group:
+    name: "{{ tomcat_group }}"
+    state: present
+  become: yes
+  become_user: root
+# Created user
+- name: Creating user.
+  user:
+    name: "{{ tomcat_user }}"
+    groups: "{{ tomcat_group }}"
+    state: present
+    append: yes
+    createhome: yes
+    home: "{{ tomcat_home }}"
+  become: yes
+  become_user: root
+# Getting tomcat
+- name: Get tomcat.
+  unarchive:
+    src: "http://archive.apache.org/dist/tomcat/tomcat-8/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz"
+    dest: "{{ tomcat_home }}"
+    remote_src: True
+  become: yes
+  become_user: "{{ tomcat_user }}"
+# Symlink
+- name: Creating link to tomcat
+  file:
+    src: "{{tomcat_home}}apache-tomcat-{{tomcat_version}}"
+    dest: "{{tomcat_home}}/current"
+    state: link
+  notify:
+    - restart tomcat
+  become: yes
+  become_user: "{{ tomcat_user }}"
+# Tomcat remote access manager scripts
+- name: Tomcat Manager Access
+  become: yes
+  become_user: "{{ tomcat_user }}"
+  template:
+    src: context.xml
+    dest: "{{tomcat_home}}/current/webapps/manager/META-INF"
+# Tomcat users
+- name: Tomcat Users Configuration
+  become: yes
+  become_user: "{{ tomcat_user }}"
+  template:
+    src: tomcat-users.xml
+    dest: "{{tomcat_home}}/current/conf"
+# Tomcat init script
+- name: Init script
+  become: yes
+  become_user: root
+  template:
+    src: tomcat
+    dest: /etc/init.d/tomcat
+    mode: 0755
+  notify:
+    - restart tomcat
+# Adding service to startup
+- name: start tomcat
+  service:
+    name: tomcat
+    state: started
+  become: yes
+  become_user: root

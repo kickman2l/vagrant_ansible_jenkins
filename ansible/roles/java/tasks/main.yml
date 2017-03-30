@@ -1,0 +1,8 @@
+---
+# tasks file for java
+- name: Needed java version.
+  yum:
+    name: java-{{java_version}}-openjdk
+    state: present
+  become: yes
+  become_user: root

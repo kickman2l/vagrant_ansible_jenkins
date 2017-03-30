@@ -1,0 +1,25 @@
+---
+# tasks file for nginx
+# Checking nginx
+- name: Ensuring nginx is exists
+  yum:
+    name: nginx
+    state: installed
+  become: yes
+  become_user: root
+# Config nginx
+- name: Configure nginx
+  become: yes
+  become_user: root
+  template:
+    src: default.conf
+    dest: /etc/nginx/conf.d/default.conf
+  notify:
+   - restart nginx
+# starting nginx
+- name: Starting nginx
+  become: yes
+  become_user: root
+  service:
+   name: nginx
+   state: started

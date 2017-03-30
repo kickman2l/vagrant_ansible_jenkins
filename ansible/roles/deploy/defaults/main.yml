@@ -1,0 +1,5 @@
+---
+# defaults file for deploy
+url: 'http://{{nginx_ip}}'
+user: admin
+password: admin

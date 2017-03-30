@@ -1,0 +1,23 @@
+---
+# tasks file for deploy
+- name: deploy war to tomcat
+  deploy:
+    url: '{{url}}'
+    war: '{{war}}'
+    user: '{{user}}'
+    password: '{{password}}'
+  delegate_to: 127.0.0.1
+- name: create dir
+  shell: 'mkdir -p /var/lib/tomcat/webapps'
+- name: Get time
+  shell: date
+  register: currentdate
+- name: Deployment info file
+  lineinfile:
+    dest: /var/lib/tomcat/webapps/deploy-info.txt
+    line: '{{currentdate.stdout}}'
+    create: yes
+- name: add deploy user to file
+  lineinfile:
+    dest: /var/lib/tomcat/webapps/deploy-info.txt
+    line: '{{user}}'

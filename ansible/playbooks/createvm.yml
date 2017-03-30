@@ -1,0 +1,18 @@
+# CREATE VM
+- name: provision VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Check state and up vbox.
+    runbox: path=../resources/virtualbox/ state=started
+    register: output
+
+  - name: Debug info
+    debug: msg={{output}}
+
+  - name: create a new file with lineinfile
+    lineinfile:
+      dest: inv
+      line: "vagrant hostname={{ output.RES_BOX_IPADDR }} ansible_ssh_host={{ output.RES_BOX_IPADDR }} ansible_ssh_port=22 ansible_ssh_private_key_file={{ output.RES_BOX_SSH_PATH }} ansible_user={{ output.RES_BOX_USR }}"
+      state: present
+      create: True
